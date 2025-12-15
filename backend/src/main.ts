@@ -11,8 +11,6 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { CustomLoggerService } from './common/services/logger.service';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import fastifySwagger from '@fastify/swagger';
-import { OpenAPIV3 } from 'openapi-types';
 
 declare const module: any;
 
@@ -28,6 +26,12 @@ async function bootstrap() {
 
   const logger = app.get(CustomLoggerService);
 
+  // Enable CORS
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
   // Apply global interceptors
   app.useGlobalInterceptors(
     new LoggingInterceptor(logger),
@@ -39,22 +43,20 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
   // Setup Swagger
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  await app.register(fastifySwagger, {
-    mode: 'static',
-    specification: {
-      document: document as OpenAPIV3.Document,
-    },
-  });
   SwaggerModule.setup('api/docs', app, document);
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  await app.listen(3000, '0.0.0.0');
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  logger.log(`Application is running on: http://localhost:${port}`);
+  logger.log(`Swagger documentation: http://localhost:${port}/api/docs`);
 
   if (module.hot) {
     module.hot.accept();

@@ -3,14 +3,18 @@ export default () => ({
   supabase: {
     url: process.env.SUPABASE_URL,
     key: process.env.SUPABASE_KEY,
-  },
-  admin: {
-    superAdminEmail: process.env.SUPER_ADMIN_EMAIL || 'super.admin@example.com',
-    superAdminPassword: process.env.SUPER_ADMIN_PASSWORD || 'superadmin123',
+    serviceRoleKey: process.env.SUPABASE_SERVICE_KEY,
   },
   database: {
-    url:
-      process.env.DATABASE_URL ||
-      'postgresql://postgres.uihbeodokuhfpgfdlpky:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres',
+    url: process.env.DATABASE_URL,
+  },
+  payment: {
+    webhookSecret: process.env.PAYMENT_WEBHOOK_SECRET,
+  },
+  booking: {
+    seatLockDurationMinutes: parseInt(
+      process.env.SEAT_LOCK_DURATION_MINUTES || '10',
+      10,
+    ),
   },
 });

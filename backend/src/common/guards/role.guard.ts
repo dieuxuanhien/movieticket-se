@@ -2,33 +2,27 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  UnauthorizedException,
+  ForbiddenException,
+  SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { APP_ROLES } from 'src/common/constants/app.constants';
+import { UserRole } from '../constants/app.constants';
 
-export const Roles = (...roles: APP_ROLES[]) => {
-  return (
-    target: any,
-    propertyKey?: string,
-    descriptor?: PropertyDescriptor,
-  ) => {
-    Reflect.defineMetadata('roles', roles, descriptor?.value ?? target);
-  };
-};
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
 
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const roles = this.reflector.get<APP_ROLES[]>(
-      'roles',
-      context.getHandler(),
+    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
     );
 
     // If no roles are specified, allow access
-    if (!roles) {
+    if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
 
@@ -36,13 +30,15 @@ export class RoleGuard implements CanActivate {
     const user = request.user;
 
     // Check if user exists and has a role
-    if (!user?.user_metadata?.role) {
-      throw new UnauthorizedException('User role not found');
+    if (!user?.role) {
+      throw new ForbiddenException('User role not found');
     }
 
     // Check if user's role is included in the required roles
-    if (!roles.includes(user.user_metadata.role)) {
-      throw new UnauthorizedException('Insufficient permissions');
+    if (!requiredRoles.includes(user.role as UserRole)) {
+      throw new ForbiddenException(
+        `Access denied. Required roles: ${requiredRoles.join(', ')}`,
+      );
     }
 
     return true;

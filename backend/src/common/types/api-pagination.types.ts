@@ -12,7 +12,7 @@ export interface SearchParams {
   search?: string;
 }
 
-// pagination sort search params
+// Combined query params
 export interface ListQueryParams
   extends PaginationParams,
     SortParams,

@@ -1,119 +1,132 @@
-import { Injectable } from '@nestjs/common';
-import { SupabaseService } from 'src/infrastructure/supabase/supabase.service';
-import { PaginationService } from 'src/common/services/pagination.service';
-import {
-  PaginationParams,
-  SortParams,
-} from 'src/common/types/api-pagination.types';
-import { User as SupabaseUser, User } from '@supabase/supabase-js';
-import { adaptSupabaseUser } from './helpers/user-adapter.helper';
-import { PaginatedApiResponse } from 'src/common/types/api-response.types';
-import { CustomLoggerService } from 'src/common/services/logger.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { PaginationService } from '../../common/services/pagination.service';
+import { UpdateUserDto, AssignUserRoleDto } from './dto/user.dto';
+import { UserRole } from '../../common/constants/app.constants';
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new CustomLoggerService(UsersService.name);
-
   constructor(
-    private readonly supabaseService: SupabaseService,
+    private readonly prisma: PrismaService,
     private readonly paginationService: PaginationService,
   ) {}
 
   async findAll(
-    params?: PaginationParams & SortParams,
-  ): Promise<PaginatedApiResponse<User[]>> {
-    try {
-      this.logger.log('Fetching all users with pagination');
-      this.logger.debug('Pagination params:', params);
+    paginationParams: { page?: number; perPage?: number },
+    role?: UserRole,
+  ) {
+    const { page, perPage } =
+      this.paginationService.getPaginationParams(paginationParams);
+    const skip = this.paginationService.getSkip(page, perPage);
 
-      const paginationParams =
-        this.paginationService.getPaginationParams(params);
-      const sortParams = this.paginationService.getSortParams(params);
+    const where = role ? { role } : {};
 
-      const { data, error } = await this.supabaseService
-        .getAdminClient()
-        .auth.admin.listUsers({
-          page: paginationParams.page - 1,
-          perPage: paginationParams.perPage,
-        });
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: perPage,
+        include: { cinema: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
 
-      if (error) {
-        this.logger.error('Error fetching users:', error);
-        throw error;
-      }
+    return {
+      data: users,
+      pagination: {
+        total,
+        page,
+        perPage,
+        totalPages: Math.ceil(total / perPage),
+      },
+    };
+  }
 
-      const adaptedUsers = data.users.map((user) => adaptSupabaseUser(user));
-      this.logger.log(`Successfully fetched ${adaptedUsers.length} users`);
+  async findById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        cinema: true,
+        bookings: {
+          take: 10,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            showtime: {
+              include: {
+                movie: true,
+                cinema: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-      return this.paginationService.paginateData(
-        adaptedUsers,
-        paginationParams,
-        sortParams,
-        '/users',
-      );
-    } catch (error) {
-      this.logger.error('Failed to fetch users:', error);
-      throw error;
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    return user;
   }
 
-  async findOne(id: string): Promise<User | null> {
-    const { data, error } = await this.supabaseService
-      .getAdminClient()
-      .auth.admin.getUserById(id);
-    if (error) throw error;
-    return data.user ? adaptSupabaseUser(data.user) : null;
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      include: { cinema: true },
+    });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    const { data, error } = await this.supabaseService
-      .getAdminClient()
-      .auth.admin.listUsers();
-    if (error) throw error;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
 
-    const user = data.users.find((user: SupabaseUser) => user.email === email);
-    return user ? adaptSupabaseUser(user) : null;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+      include: { cinema: true },
+    });
   }
 
-  async update(id: string, data: Partial<User>) {
-    const { data: updatedUser, error } = await this.supabaseService
-      .getAdminClient()
-      .auth.admin.updateUserById(id, {
-        user_metadata: data.user_metadata,
-      });
-    if (error) throw error;
-    return adaptSupabaseUser(updatedUser.user);
-  }
+  async assignRole(id: string, assignRoleDto: AssignUserRoleDto) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
 
-  async banUser(id: string) {
-    const { data: bannedUser, error: banError } = await this.supabaseService
-      .getAdminClient()
-      .auth.admin.updateUserById(id, {
-        user_metadata: { is_banned: true },
-      });
-    if (banError) throw banError;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-    const adaptedUser = adaptSupabaseUser(bannedUser.user);
-    return { ...adaptedUser, message: 'User banned successfully' };
-  }
-
-  async unbanUser(id: string) {
-    const { data: unbannedUser, error: unbanError } = await this.supabaseService
-      .getAdminClient()
-      .auth.admin.updateUserById(id, {
-        user_metadata: { is_banned: false },
-      });
-    if (unbanError) throw unbanError;
-
-    const adaptedUser = adaptSupabaseUser(unbannedUser.user);
-    return { ...adaptedUser, message: 'User unbanned successfully' };
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        role: assignRoleDto.role,
+        cinemaId: assignRoleDto.cinemaId,
+      },
+      include: { cinema: true },
+    });
   }
 
   async delete(id: string) {
-    const { error } = await this.supabaseService
-      .getAdminClient()
-      .auth.admin.deleteUser(id);
-    if (error) throw error;
-    return { success: true };
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.prisma.user.delete({ where: { id } });
+
+    return { message: 'User deleted successfully' };
+  }
+
+  async findByCinema(cinemaId: string) {
+    return this.prisma.user.findMany({
+      where: {
+        cinemaId,
+        role: { in: ['MANAGER', 'STAFF'] },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }

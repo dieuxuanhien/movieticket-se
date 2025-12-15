@@ -1,151 +1,98 @@
 import {
   Controller,
   Get,
-  Body,
-  Param,
   Put,
   Delete,
-  UseGuards,
+  Body,
+  Param,
   Query,
-  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
-import { User } from './entities/user.entity';
-import { SupabaseGuard } from 'src/common/guards/supabase.guard';
+import { UsersService } from './users.service';
+import { UpdateUserDto, AssignUserRoleDto } from './dto/user.dto';
+import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { RoleGuard, Roles } from '../../common/guards/role.guard';
+import { CurrentUserId } from '../../common/decorators/current-user.decorator';
+import { UserRole } from '../../common/constants/app.constants';
 import {
   ApiTags,
-  ApiBearerAuth,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
-import {
-  PAGINATION_CONSTANTS,
-  PaginationSortFields,
-} from 'src/common/constants/pagination.constants';
-import { APP_ROLES } from 'src/common/constants/app.constants';
-import { UsersService } from './users.service';
-import { RoleGuard, Roles } from 'src/common/guards/role.guard';
 
-@ApiTags('Admin / Users')
-@Controller('admin/users')
+@ApiTags('users')
+@Controller('users')
 @UseGuards(SupabaseGuard, RoleGuard)
 @ApiBearerAuth('JWT-auth')
-export class AdminUsersController {
+export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all users (Admin)' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'perPage',
-    required: false,
-    type: Number,
-    description: 'Number of items per page',
-    example: 10,
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    enum: PaginationSortFields,
-    description: 'Sort by field',
-    example: PaginationSortFields.CREATED_AT,
-  })
-  @ApiQuery({
-    name: 'ascending',
-    required: false,
-    type: Boolean,
-    description: 'Sort by ascending',
-    example: true,
-  })
-  @Roles(APP_ROLES.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all users (Admin only)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'perPage', required: false, type: Number })
+  @ApiQuery({ name: 'role', required: false, enum: UserRole })
+  @ApiResponse({ status: 200, description: 'List of users' })
   async findAll(
-    @Query('page') page: number = PAGINATION_CONSTANTS.DEFAULT_PAGE,
-    @Query('perPage') perPage: number = PAGINATION_CONSTANTS.DEFAULT_PER_PAGE,
-    @Query('sortBy')
-    sortBy: PaginationSortFields = PAGINATION_CONSTANTS.DEFAULT_SORT_BY,
-    @Query('ascending')
-    ascending: boolean = PAGINATION_CONSTANTS.DEFAULT_SORT_ASCENDING,
+    @Query('page') page?: number,
+    @Query('perPage') perPage?: number,
+    @Query('role') role?: UserRole,
   ) {
-    try {
-      return await this.usersService.findAll({
-        page: typeof page === 'string' ? parseInt(page) : page,
-        perPage: typeof perPage === 'string' ? parseInt(perPage) : perPage,
-        sortBy,
-        ascending:
-          typeof ascending === 'string' ? ascending === 'true' : ascending,
-      });
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    return this.usersService.findAll({ page, perPage }, role);
+  }
+
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, description: 'Current user profile' })
+  async getMe(@CurrentUserId() userId: string) {
+    return this.usersService.findById(userId);
+  }
+
+  @Put('me')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, description: 'Profile updated' })
+  async updateMe(
+    @CurrentUserId() userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(userId, updateUserDto);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by id (Admin)' })
-  @ApiResponse({ status: 200, description: 'Returns a user' })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get user by ID (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User found' })
   async findOne(@Param('id') id: string) {
-    try {
-      const user = await this.usersService.findOne(id);
-      if (!user) {
-        throw new BadRequestException('User not found');
-      }
-      return user;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    return this.usersService.findById(id);
   }
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Update user (Admin)' })
-  @ApiResponse({ status: 200, description: 'User updated successfully' })
-  async update(@Param('id') id: string, @Body() data: Partial<User>) {
-    try {
-      const user = await this.usersService.update(id, data);
-      if (!user) {
-        throw new BadRequestException('User not found');
-      }
-      return user;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+  @Put(':id/role')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Assign role to user (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Role assigned' })
+  async assignRole(
+    @Param('id') id: string,
+    @Body() assignRoleDto: AssignUserRoleDto,
+  ) {
+    return this.usersService.assignRole(id, assignRoleDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete user (Admin)' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Delete user (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User deleted' })
   async delete(@Param('id') id: string) {
-    try {
-      await this.usersService.delete(id);
-      return { message: 'User deleted successfully' };
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    return this.usersService.delete(id);
   }
 
-  @Put(':id/ban')
-  @ApiOperation({ summary: 'Ban user (Admin)' })
-  @ApiResponse({ status: 200, description: 'User banned successfully' })
-  async banUser(@Param('id') id: string) {
-    try {
-      return await this.usersService.banUser(id);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  @Put(':id/unban')
-  @ApiOperation({ summary: 'Unban user (Admin)' })
-  @ApiResponse({ status: 200, description: 'User unbanned successfully' })
-  async unbanUser(@Param('id') id: string) {
-    try {
-      return await this.usersService.unbanUser(id);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+  @Get('cinema/:cinemaId')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Get employees by cinema (Admin/Manager)' })
+  @ApiResponse({ status: 200, description: 'List of cinema employees' })
+  async findByCinema(@Param('cinemaId') cinemaId: string) {
+    return this.usersService.findByCinema(cinemaId);
   }
 }

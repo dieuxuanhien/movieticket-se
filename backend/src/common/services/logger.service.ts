@@ -78,12 +78,12 @@ export class CustomLoggerService extends Logger {
     const { duration, ...rest } = metadata;
     this.log(`HTTP ${metadata.method} ${metadata.path}`, {
       ...rest,
-      durationMs: duration, // Store raw number
+      duration: duration ? `${duration}ms` : undefined,
     });
   }
 
   logError(error: Error, metadata?: LogMetadata) {
-    this.error('An error occurred', {
+    this.error(`Error: ${error.message}`, {
       ...metadata,
       error: {
         name: error.name,
@@ -93,15 +93,15 @@ export class CustomLoggerService extends Logger {
     });
   }
 
-  logDatabaseQuery(query: string, duration: number, metadata?: LogMetadata) {
-    this.debug('Database Query', {
-      ...metadata,
-      query,
-      durationMs: duration, // Store raw number
-    });
+  logAuth(message: string, metadata?: LogMetadata) {
+    this.log(`[AUTH] ${message}`, metadata);
   }
 
-  logAuth(action: string, metadata?: LogMetadata) {
-    this.log(`Auth: ${action}`, metadata);
+  logBooking(message: string, metadata?: LogMetadata) {
+    this.log(`[BOOKING] ${message}`, metadata);
+  }
+
+  logPayment(message: string, metadata?: LogMetadata) {
+    this.log(`[PAYMENT] ${message}`, metadata);
   }
 }

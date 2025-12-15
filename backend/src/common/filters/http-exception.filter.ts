@@ -20,10 +20,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    let errorMessage = 'Internal server error';
+
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'string') {
+        errorMessage = exceptionResponse;
+      } else if (typeof exceptionResponse === 'object') {
+        errorMessage =
+          (exceptionResponse as any).message ||
+          (exceptionResponse as any).error ||
+          errorMessage;
+      }
+    } else {
+      errorMessage = exception.message || errorMessage;
+    }
+
     const errorResponse: ApiResponse<null> = {
       success: false,
       data: null,
-      error: exception.message || 'Internal server error',
+      error: Array.isArray(errorMessage)
+        ? errorMessage.join(', ')
+        : errorMessage,
       timestamp: new Date().toISOString(),
       path: request.url,
     };

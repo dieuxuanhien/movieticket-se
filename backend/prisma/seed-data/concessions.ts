@@ -1,0 +1,16 @@
+export const concessions = [
+  { cinemaIndex: null, name: 'Popcorn Small', price: 50000 },
+  { cinemaIndex: null, name: 'Popcorn Medium', price: 70000 },
+  { cinemaIndex: null, name: 'Popcorn Large', price: 90000 },
+  { cinemaIndex: null, name: 'Coca Cola Small', price: 35000 },
+  { cinemaIndex: null, name: 'Coca Cola Medium', price: 45000 },
+  { cinemaIndex: null, name: 'Coca Cola Large', price: 55000 },
+  { cinemaIndex: null, name: 'Pepsi Small', price: 35000 },
+  { cinemaIndex: null, name: 'Pepsi Medium', price: 45000 },
+  { cinemaIndex: null, name: 'Pepsi Large', price: 55000 },
+  { cinemaIndex: null, name: 'Nachos', price: 60000 },
+  { cinemaIndex: null, name: 'Hot Dog', price: 45000 },
+  { cinemaIndex: null, name: 'Combo 1 (Popcorn M + Drink M)', price: 100000 },
+  { cinemaIndex: null, name: 'Combo 2 (Popcorn L + Drink L)', price: 130000 },
+  { cinemaIndex: null, name: 'Combo Family (2 Popcorn L + 4 Drinks)', price: 250000 },
+];

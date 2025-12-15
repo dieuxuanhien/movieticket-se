@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { ConfigService } from 'src/config/config.service';
+import {
+  createClient,
+  SupabaseClient,
+  RealtimeChannel,
+} from '@supabase/supabase-js';
+import { ConfigService } from '../../config/config.service';
 
 /**
  * @description This service is used to create and manage Supabase clients.
@@ -44,7 +48,6 @@ export class SupabaseService {
    * @returns {SupabaseClient} The Supabase client.
    */
   getClient(): SupabaseClient {
-    this.logger.debug('Getting regular Supabase client');
     return this.supabase;
   }
 
@@ -53,7 +56,34 @@ export class SupabaseService {
    * @returns {SupabaseClient} The admin Supabase client.
    */
   getAdminClient(): SupabaseClient {
-    this.logger.debug('Getting admin Supabase client');
     return this.adminClient;
+  }
+
+  /**
+   * @description Subscribe to real-time changes on a table
+   * @param tableName The name of the table to subscribe to
+   * @param callback Function to call when changes occur
+   * @returns {RealtimeChannel} The subscription channel
+   */
+  subscribeToTable(
+    tableName: string,
+    callback: (payload: any) => void,
+  ): RealtimeChannel {
+    return this.supabase
+      .channel(`public:${tableName}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: tableName },
+        callback,
+      )
+      .subscribe();
+  }
+
+  /**
+   * @description Unsubscribe from a channel
+   * @param channel The channel to unsubscribe from
+   */
+  async unsubscribe(channel: RealtimeChannel): Promise<void> {
+    await this.supabase.removeChannel(channel);
   }
 }

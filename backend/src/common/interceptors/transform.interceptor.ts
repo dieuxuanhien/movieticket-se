@@ -20,9 +20,14 @@ export class TransformInterceptor<T>
 
     return next.handle().pipe(
       map((data) => {
+        // If the response already has the success property, it's already formatted
+        if (data?.success !== undefined) {
+          return data;
+        }
+
         const response: ApiResponse<T> = {
           success: true,
-          data: data?.data || data,
+          data: data?.data !== undefined ? data.data : data,
           error: null,
           timestamp: new Date().toISOString(),
           path: request.url,

@@ -8,7 +8,10 @@ export class PaginationService {
   getPaginationParams(params?: PaginationParams): Required<PaginationParams> {
     return {
       page: params?.page || PAGINATION_CONSTANTS.DEFAULT_PAGE,
-      perPage: params?.perPage || PAGINATION_CONSTANTS.DEFAULT_PER_PAGE,
+      perPage: Math.min(
+        params?.perPage || PAGINATION_CONSTANTS.DEFAULT_PER_PAGE,
+        PAGINATION_CONSTANTS.MAX_PER_PAGE,
+      ),
     };
   }
 
@@ -20,40 +23,36 @@ export class PaginationService {
     };
   }
 
+  getSkip(page: number, perPage: number): number {
+    return (page - 1) * perPage;
+  }
+
   paginateData<T>(
     data: T[],
+    total: number,
     params: Required<PaginationParams>,
-    sortParams: Required<SortParams>,
     path: string,
   ): PaginatedApiResponse<T[]> {
-    // Sort the data
-    const sortedData = [...data].sort((a, b) => {
-      const aValue = a[sortParams.sortBy];
-      const bValue = b[sortParams.sortBy];
-
-      if (sortParams.ascending) {
-        return aValue > bValue ? 1 : -1;
-      }
-      return aValue < bValue ? 1 : -1;
-    });
-
-    // Calculate pagination
-    const start = (params.page - 1) * params.perPage;
-    const end = start + params.perPage;
-    const paginatedData = sortedData.slice(start, end);
-
     return {
       success: true,
-      data: paginatedData,
+      data,
       error: null,
       timestamp: new Date().toISOString(),
       path,
       pagination: {
-        total: data.length,
+        total,
         page: params.page,
         perPage: params.perPage,
-        totalPages: Math.ceil(data.length / params.perPage),
+        totalPages: Math.ceil(total / params.perPage),
       },
     };
+  }
+
+  // Helper for Prisma orderBy
+  getOrderBy(
+    sortBy: string,
+    ascending: boolean,
+  ): Record<string, 'asc' | 'desc'> {
+    return { [sortBy]: ascending ? 'asc' : 'desc' };
   }
 }

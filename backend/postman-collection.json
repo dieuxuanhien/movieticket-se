@@ -1,0 +1,1596 @@
+{
+	"info": {
+		"_postman_id": "movieticket-api-collection",
+		"name": "Movie Ticket Booking System API",
+		"description": "Complete API collection for testing Movie Ticket Booking System endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\",\n  \"fullName\": \"Test User\",\n  \"phone\": \"0912345678\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.access_token) {",
+									"        pm.environment.set('accessToken', response.data.access_token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user1@example.com\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/signin",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "signin"]
+						}
+					}
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Sign Out",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/signout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "signout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Movies",
+			"item": [
+				{
+					"name": "Get All Movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movies?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "search", "value": "", "disabled": true},
+								{"key": "genreId", "value": "", "disabled": true}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Now Showing Movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movies/now-showing",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies", "now-showing"]
+						}
+					}
+				},
+				{
+					"name": "Get Coming Soon Movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movies/coming-soon",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies", "coming-soon"]
+						}
+					}
+				},
+				{
+					"name": "Get Movie By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movies/{{movieId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies", "{{movieId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Movie Showtimes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movies/{{movieId}}/showtimes",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies", "{{movieId}}", "showtimes"]
+						}
+					}
+				},
+				{
+					"name": "Create Movie (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"New Movie\",\n  \"posterUrl\": \"https://example.com/poster.jpg\",\n  \"trailerUrl\": \"https://youtube.com/watch?v=xyz\",\n  \"runtime\": 120,\n  \"releaseDate\": \"2025-01-01\",\n  \"ageRating\": \"T13\",\n  \"genreIds\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/movies",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies"]
+						}
+					}
+				},
+				{
+					"name": "Update Movie (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Movie Title\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/movies/{{movieId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies", "{{movieId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Movie (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/movies/{{movieId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["movies", "{{movieId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Genres",
+			"item": [
+				{
+					"name": "Get All Genres",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/genres",
+							"host": ["{{baseUrl}}"],
+							"path": ["genres"]
+						}
+					}
+				},
+				{
+					"name": "Get Genre By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/genres/{{genreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["genres", "{{genreId}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Genre (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New Genre\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/genres",
+							"host": ["{{baseUrl}}"],
+							"path": ["genres"]
+						}
+					}
+				},
+				{
+					"name": "Update Genre (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Genre Name\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/genres/{{genreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["genres", "{{genreId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Genre (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/genres/{{genreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["genres", "{{genreId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cinemas",
+			"item": [
+				{
+					"name": "Get All Cinemas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cinemas?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "city", "value": "", "disabled": true}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cinemas/cities",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas", "cities"]
+						}
+					}
+				},
+				{
+					"name": "Get Cinema By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas", "{{cinemaId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Cinema Halls",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}/halls",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas", "{{cinemaId}}", "halls"]
+						}
+					}
+				},
+				{
+					"name": "Get Cinema Showtimes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}/showtimes",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas", "{{cinemaId}}", "showtimes"]
+						}
+					}
+				},
+				{
+					"name": "Create Cinema (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New Cinema\",\n  \"address\": \"123 Street\",\n  \"city\": \"Hanoi\",\n  \"status\": \"ACTIVE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/cinemas",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas"]
+						}
+					}
+				},
+				{
+					"name": "Update Cinema (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Cinema Name\",\n  \"status\": \"MAINTENANCE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas", "{{cinemaId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Cinema (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["cinemas", "{{cinemaId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Halls",
+			"item": [
+				{
+					"name": "Get Hall By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/halls/{{hallId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls", "{{hallId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Hall Seats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/halls/{{hallId}}/seats",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls", "{{hallId}}", "seats"]
+						}
+					}
+				},
+				{
+					"name": "Create Hall (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cinemaId\": \"{{cinemaId}}\",\n  \"name\": \"Hall 5\",\n  \"type\": \"STANDARD\",\n  \"capacity\": 100\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/halls",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls"]
+						}
+					}
+				},
+				{
+					"name": "Update Hall (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Hall 5A\",\n  \"status\": \"MAINTENANCE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/halls/{{hallId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls", "{{hallId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Hall (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/halls/{{hallId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls", "{{hallId}}"]
+						}
+					}
+				},
+				{
+					"name": "Generate Seats (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rows\": 10,\n  \"seatsPerRow\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/halls/{{hallId}}/seats",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls", "{{hallId}}", "seats"]
+						}
+					}
+				},
+				{
+					"name": "Delete All Seats (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/halls/{{hallId}}/seats",
+							"host": ["{{baseUrl}}"],
+							"path": ["halls", "{{hallId}}", "seats"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Showtimes",
+			"item": [
+				{
+					"name": "Get All Showtimes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/showtimes?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["showtimes"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "movieId", "value": "", "disabled": true},
+								{"key": "cinemaId", "value": "", "disabled": true},
+								{"key": "date", "value": "", "disabled": true}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Showtime By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["showtimes", "{{showtimeId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Showtime Seats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}/seats",
+							"host": ["{{baseUrl}}"],
+							"path": ["showtimes", "{{showtimeId}}", "seats"]
+						}
+					}
+				},
+				{
+					"name": "Create Showtime (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"movieId\": \"{{movieId}}\",\n  \"cinemaId\": \"{{cinemaId}}\",\n  \"hallId\": \"{{hallId}}\",\n  \"startTime\": \"2025-12-16T18:00:00Z\",\n  \"format\": \"TWO_D\",\n  \"pricing\": [\n    {\"seatType\": \"STANDARD\", \"price\": 80000},\n    {\"seatType\": \"VIP\", \"price\": 150000},\n    {\"seatType\": \"COUPLE\", \"price\": 200000}\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/showtimes",
+							"host": ["{{baseUrl}}"],
+							"path": ["showtimes"]
+						}
+					}
+				},
+				{
+					"name": "Update Showtime (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"startTime\": \"2025-12-16T19:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["showtimes", "{{showtimeId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Showtime (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["showtimes", "{{showtimeId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Lock Seats",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seatIds\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings/lock",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "lock"]
+						}
+					}
+				},
+				{
+					"name": "Unlock Seats",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seatIds\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings/unlock",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "unlock"]
+						}
+					}
+				},
+				{
+					"name": "Get My Seat Locks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/locks/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "locks", "my"]
+						}
+					}
+				},
+				{
+					"name": "Create Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.id) {",
+									"        pm.environment.set('bookingId', response.data.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seatIds\": [],\n  \"concessions\": [\n    {\"concessionId\": \"\", \"quantity\": 2}\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings"]
+						}
+					}
+				},
+				{
+					"name": "Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paymentMethod\": \"VNPAY\",\n  \"returnUrl\": \"http://localhost:3001/booking/success\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings/{{bookingId}}/payment",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "{{bookingId}}", "payment"]
+						}
+					}
+				},
+				{
+					"name": "Get My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/my?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "my"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Booking By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "{{bookingId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Booking By Code",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/code/{{bookingCode}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "code", "{{bookingCode}}"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/{{bookingId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "{{bookingId}}", "cancel"]
+						}
+					}
+				},
+				{
+					"name": "Get All Bookings (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/admin/all?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "admin", "all"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Showtime Bookings (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/admin/showtime/{{showtimeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "admin", "showtime", "{{showtimeId}}"]
+						}
+					}
+				},
+				{
+					"name": "Expire Pending Bookings (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/admin/expire",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "admin", "expire"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tickets",
+			"item": [
+				{
+					"name": "Get Ticket By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/{{ticketId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "{{ticketId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Tickets By Booking",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/booking/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "booking", "{{bookingId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Tickets By Showtime (Staff)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/showtime/{{showtimeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "showtime", "{{showtimeId}}"]
+						}
+					}
+				},
+				{
+					"name": "Scan Ticket (Staff)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ticketId\": \"{{ticketId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/scan",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "scan"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Concessions",
+			"item": [
+				{
+					"name": "Get All Concessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/concessions?cinemaId={{cinemaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["concessions"],
+							"query": [
+								{"key": "cinemaId", "value": "{{cinemaId}}", "disabled": true}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Concession By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/concessions/{{concessionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["concessions", "{{concessionId}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Concession (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Special Combo\",\n  \"price\": 150000,\n  \"cinemaId\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/concessions",
+							"host": ["{{baseUrl}}"],
+							"path": ["concessions"]
+						}
+					}
+				},
+				{
+					"name": "Update Concession (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 160000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/concessions/{{concessionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["concessions", "{{concessionId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Concession (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/concessions/{{concessionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["concessions", "{{concessionId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "Get All Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Cinema Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/cinema/{{cinemaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "cinema", "{{cinemaId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Cinema Review Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/cinema/{{cinemaId}}/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "cinema", "{{cinemaId}}", "stats"]
+						}
+					}
+				},
+				{
+					"name": "Get My Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "my"]
+						}
+					}
+				},
+				{
+					"name": "Create Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cinemaId\": \"{{cinemaId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great cinema experience!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews"]
+						}
+					}
+				},
+				{
+					"name": "Update Review",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated review\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "{{reviewId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Review",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "{{reviewId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "role", "value": "", "disabled": true}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Current User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "me"]
+						}
+					}
+				},
+				{
+					"name": "Update Current User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Updated Name\",\n  \"phone\": \"0987654321\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "me"]
+						}
+					}
+				},
+				{
+					"name": "Get User By ID (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update User Role (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"MANAGER\",\n  \"cinemaId\": \"{{cinemaId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/role",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}", "role"]
+						}
+					}
+				},
+				{
+					"name": "Delete User (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Cinema Employees (Manager)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/cinema/{{cinemaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "cinema", "{{cinemaId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Seats",
+			"item": [
+				{
+					"name": "Get Seat By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/seats/{{seatId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["seats", "{{seatId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Seat (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"VIP\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/seats/{{seatId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["seats", "{{seatId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "movieId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "genreId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cinemaId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "hallId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "showtimeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ticketId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "concessionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "reviewId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "seatId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -1,9 +1,15 @@
-import { IsEmail, IsString, MinLength, Matches } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  IsOptional,
+  Matches,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SignUpDto {
   @ApiProperty({
-    example: 'yassine.elouni.dev@gmail.com',
+    example: 'user@example.com',
     description: 'The email of the user',
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
@@ -12,7 +18,7 @@ export class SignUpDto {
   @ApiProperty({
     example: 'Password123!',
     description:
-      'The password for the account. Must contain at least 6 characters, including uppercase, lowercase, number and special character',
+      'Password must contain at least 6 characters, including uppercase, lowercase, number and special character',
     minimum: 6,
   })
   @IsString()
@@ -25,11 +31,27 @@ export class SignUpDto {
     },
   )
   password: string;
+
+  @ApiPropertyOptional({
+    example: 'John Doe',
+    description: 'Full name of the user',
+  })
+  @IsOptional()
+  @IsString()
+  fullName?: string;
+
+  @ApiPropertyOptional({
+    example: '+84901234567',
+    description: 'Phone number of the user',
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string;
 }
 
 export class SignInDto {
   @ApiProperty({
-    example: 'yassine.elouni.dev@gmail.com',
+    example: 'user@example.com',
     description: 'The email of the user',
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })

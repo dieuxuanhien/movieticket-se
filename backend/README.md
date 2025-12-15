@@ -208,5 +208,89 @@ Deploy your application following these steps:
    - Monitor performance metrics
    - Set up alerts for critical issues
 
-## 8. License
+## 8. Database Seeding & API Testing
+
+### 8.1 Seeding the Database
+
+The project includes comprehensive seed data for testing and development:
+
+```bash
+# Seed the database with sample data
+pnpm prisma db seed
+
+# Reset database and reseed (⚠️  Deletes all data)
+pnpm prisma migrate reset
+```
+
+**What gets seeded:**
+- 15 Genres (Action, Comedy, Drama, Horror, etc.)
+- 6 Cinemas across Hanoi, Ho Chi Minh, and Da Nang
+- 14 Halls with different types (STANDARD, VIP, IMAX)
+- 1,600+ Seats auto-generated for each hall
+- 12 Popular movies with genres and ratings
+- 210 Showtimes for the next 7 days
+- Dynamic ticket pricing based on seat type and format
+- 7 Users with different roles (Admin, Manager, Staff, User)
+- 14 Concessions (snacks, drinks, combos)
+- Sample cinema reviews
+
+### 8.2 API Testing with Postman
+
+A complete Postman collection with **80+ requests** is included:
+
+**Import the collection:**
+1. Open Postman
+2. Click "Import"
+3. Select `postman-collection.json`
+4. Set environment variable: `baseUrl = http://localhost:3000`
+
+**Collection includes:**
+- Authentication (Sign Up, Sign In, Token Management)
+- Movies (CRUD, Now Showing, Coming Soon, Showtimes)
+- Genres (Full CRUD operations)
+- Cinemas (List by city, CRUD, Halls, Showtimes)
+- Halls (CRUD, Seat management)
+- Showtimes (CRUD, Seat availability)
+- Bookings (Seat locking, Booking creation, Payment)
+- Tickets (View, Scan for staff)
+- Concessions (CRUD for food & beverages)
+- Reviews (Cinema reviews with ratings)
+- Users (User management, Role assignment)
+- Seats (Get and update seat information)
+- Health (System health check)
+
+**Sample Credentials** (after seeding):
+- Admin: `admin@movieticket.com` (ID: admin-user-001)
+- Manager: `manager.hanoi@movieticket.com` (ID: manager-user-001)
+- Staff: `staff1@movieticket.com` (ID: staff-user-001)
+- User: `user1@example.com` (ID: user-001)
+
+⚠️ **Note**: Users must be created in Supabase Auth with matching emails and IDs.
+
+### 8.3 Additional Documentation
+
+- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Complete guide for seeding and testing
+- **[SEEDED_DATA.md](./SEEDED_DATA.md)** - Quick reference for all seeded data
+- **[../docs/API_TESTING_WORKFLOW.md](../docs/API_TESTING_WORKFLOW.md)** - Visual workflow diagrams
+- **[../docs/TESTING_SETUP_COMPLETE.md](../docs/TESTING_SETUP_COMPLETE.md)** - Setup summary
+
+### 8.4 Quick Testing Workflow
+
+```bash
+# 1. Seed the database
+pnpm prisma db seed
+
+# 2. Start the development server
+pnpm run start:dev
+
+# 3. Import Postman collection and start testing
+
+# 4. View database in GUI (optional)
+pnpm prisma studio
+
+# 5. Access Swagger documentation
+# http://localhost:3000/api/docs
+```
+
+## 9. License
 This project is protected under the [MIT License](https://github.com/nestjs/nest/blob/master/LICENSE). See the LICENSE file for details.
