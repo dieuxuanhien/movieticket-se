@@ -12,6 +12,6 @@ import { ConfigModule } from 'src/config/config.module';
   imports: [ConfigModule],
   controllers: [BookingsController],
   providers: [BookingsService, SeatLockService, PaymentService, VnpayService],
-  exports: [BookingsService, SeatLockService, VnpayService],
+  exports: [BookingsService, SeatLockService, PaymentService, VnpayService],
 })
 export class BookingsModule {}

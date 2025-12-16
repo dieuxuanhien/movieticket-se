@@ -140,6 +140,8 @@ export class BookingsService {
     );
 
     // Create booking in transaction
+    // Note: Tickets will be created later when payment is confirmed via IPN
+    // We keep seat locks until payment is confirmed, then create tickets from them
     const booking = await this.prisma.$transaction(async (tx) => {
       const newBooking = await tx.booking.create({
         data: {
@@ -150,15 +152,6 @@ export class BookingsService {
           status: 'PENDING',
           expiresAt,
         },
-      });
-
-      await tx.ticket.createMany({
-        data: ticketData.map((t) => ({
-          bookingId: newBooking.id,
-          seatId: t.seatId,
-          showtimeId,
-          price: t.price,
-        })),
       });
 
       if (concessionData.length > 0) {
@@ -246,7 +239,7 @@ export class BookingsService {
           select: { id: true, fullName: true, email: true, phone: true },
         },
         showtime: {
-          include: { movie: true, cinema: true, hall: true },
+          include: { movie: true, cinema: true, hall: true, pricing: true },
         },
         tickets: { include: { seat: true } },
         concessions: { include: { concession: true } },
@@ -260,6 +253,29 @@ export class BookingsService {
 
     if (userId && booking.userId !== userId) {
       throw new ForbiddenException('You can only view your own bookings');
+    }
+
+    // For pending bookings without tickets, get seat info from locks
+    if (booking.status === 'PENDING' && booking.tickets.length === 0) {
+      const seatLocks = await this.prisma.seatLock.findMany({
+        where: {
+          showtimeId: booking.showtimeId,
+          userId: booking.userId,
+        },
+        include: { seat: true },
+      });
+
+      // Add locked seats as "pending tickets" for display purposes
+      booking.tickets = seatLocks.map((lock) => ({
+        id: `pending-${lock.id}`,
+        bookingId: booking.id,
+        seatId: lock.seatId,
+        showtimeId: booking.showtimeId,
+        price:
+          booking.showtime.pricing.find((p) => p.seatType === lock.seat.type)
+            ?.price || 0,
+        seat: lock.seat,
+      })) as any;
     }
 
     return booking;
@@ -273,7 +289,7 @@ export class BookingsService {
           select: { id: true, fullName: true, email: true, phone: true },
         },
         showtime: {
-          include: { movie: true, cinema: true, hall: true },
+          include: { movie: true, cinema: true, hall: true, pricing: true },
         },
         tickets: { include: { seat: true } },
         concessions: { include: { concession: true } },
@@ -287,6 +303,29 @@ export class BookingsService {
 
     if (userId && booking.userId !== userId) {
       throw new ForbiddenException('You can only view your own bookings');
+    }
+
+    // For pending bookings without tickets, get seat info from locks
+    if (booking.status === 'PENDING' && booking.tickets.length === 0) {
+      const seatLocks = await this.prisma.seatLock.findMany({
+        where: {
+          showtimeId: booking.showtimeId,
+          userId: booking.userId,
+        },
+        include: { seat: true },
+      });
+
+      // Add locked seats as "pending tickets" for display purposes
+      booking.tickets = seatLocks.map((lock) => ({
+        id: `pending-${lock.id}`,
+        bookingId: booking.id,
+        seatId: lock.seatId,
+        showtimeId: booking.showtimeId,
+        price:
+          booking.showtime.pricing.find((p) => p.seatType === lock.seat.type)
+            ?.price || 0,
+        seat: lock.seat,
+      })) as any;
     }
 
     return booking;
@@ -303,6 +342,7 @@ export class BookingsService {
           include: { movie: true, cinema: true, hall: true },
         },
         tickets: { include: { seat: true } },
+        concessions: { include: { concession: true } },
         payment: true,
       },
       orderBy: { createdAt: 'desc' },
@@ -401,7 +441,7 @@ export class BookingsService {
         status: 'PENDING',
         expiresAt: { lt: new Date() },
       },
-      include: { tickets: true },
+      include: { tickets: true, payment: true },
     });
 
     for (const booking of expiredBookings) {
@@ -410,6 +450,14 @@ export class BookingsService {
           where: { id: booking.id },
           data: { status: 'EXPIRED' },
         });
+
+        // Update payment status to FAILED if payment exists
+        if (booking.payment) {
+          await tx.payment.update({
+            where: { id: booking.payment.id },
+            data: { status: 'FAILED' },
+          });
+        }
 
         await tx.ticket.deleteMany({ where: { bookingId: booking.id } });
 

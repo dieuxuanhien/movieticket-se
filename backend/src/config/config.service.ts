@@ -39,15 +39,15 @@ export class ConfigService {
 
   // VNPAY Configuration
   get vnpayTmnCode(): string {
-    return process.env.VNPAY_TMN_CODE || '';
+    return process.env.VNPAY_TMN_CODE;
   }
 
   get vnpaySecureSecret(): string {
-    return process.env.VNPAY_SECURE_SECRET || '';
+    return process.env.VNPAY_SECURE_SECRET;
   }
 
   get vnpayHost(): string {
-    return process.env.VNPAY_HOST || 'https://sandbox.vnpayment.vn';
+    return process.env.VNPAY_HOST;
   }
 
   get vnpayApi(): string {

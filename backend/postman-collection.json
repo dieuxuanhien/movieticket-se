@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "movieticket-api-collection",
+		"_postman_id": "025d42f2-bdef-48d0-aca6-a3cf7918885d",
 		"name": "Movie Ticket Booking System API",
 		"description": "Complete API collection for testing Movie Ticket Booking System endpoints",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38695326"
 	},
 	"item": [
 		{
@@ -25,10 +26,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/signup",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "signup"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Sign In",
@@ -43,7 +50,8 @@
 									"        pm.environment.set('accessToken', response.data.access_token);",
 									"    }",
 									"}"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -61,10 +69,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/signin",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "signin"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Current User",
@@ -78,10 +92,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/auth/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "me"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Refresh Token",
@@ -95,10 +115,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/auth/refresh",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "refresh"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Sign Out",
@@ -112,10 +138,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/auth/signout",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "signout"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"signout"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -129,16 +161,35 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/movies?page=1&limit=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "10"},
-								{"key": "search", "value": "", "disabled": true},
-								{"key": "genreId", "value": "", "disabled": true}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "genreId",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Now Showing Movies",
@@ -147,10 +198,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/movies/now-showing",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies", "now-showing"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies",
+								"now-showing"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Coming Soon Movies",
@@ -159,10 +216,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/movies/coming-soon",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies", "coming-soon"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies",
+								"coming-soon"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Movie By ID",
@@ -171,10 +234,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/movies/{{movieId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies", "{{movieId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies",
+								"{{movieId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Movie Showtimes",
@@ -183,10 +252,17 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/movies/{{movieId}}/showtimes",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies", "{{movieId}}", "showtimes"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies",
+								"{{movieId}}",
+								"showtimes"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Movie (Admin)",
@@ -208,10 +284,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/movies",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Movie (Admin)",
@@ -233,10 +314,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/movies/{{movieId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies", "{{movieId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies",
+								"{{movieId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Movie (Admin)",
@@ -250,10 +337,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/movies/{{movieId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["movies", "{{movieId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movies",
+								"{{movieId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -267,10 +360,15 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/genres",
-							"host": ["{{baseUrl}}"],
-							"path": ["genres"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"genres"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Genre By ID",
@@ -279,10 +377,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/genres/{{genreId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["genres", "{{genreId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"genres",
+								"{{genreId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Genre (Admin)",
@@ -304,10 +408,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/genres",
-							"host": ["{{baseUrl}}"],
-							"path": ["genres"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"genres"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Genre (Admin)",
@@ -329,10 +438,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/genres/{{genreId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["genres", "{{genreId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"genres",
+								"{{genreId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Genre (Admin)",
@@ -346,10 +461,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/genres/{{genreId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["genres", "{{genreId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"genres",
+								"{{genreId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -363,15 +484,30 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/cinemas?page=1&limit=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "10"},
-								{"key": "city", "value": "", "disabled": true}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "city",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cities",
@@ -380,10 +516,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/cinemas/cities",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas", "cities"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas",
+								"cities"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cinema By ID",
@@ -392,10 +534,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas", "{{cinemaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas",
+								"{{cinemaId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cinema Halls",
@@ -404,10 +552,17 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}/halls",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas", "{{cinemaId}}", "halls"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas",
+								"{{cinemaId}}",
+								"halls"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cinema Showtimes",
@@ -416,10 +571,17 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}/showtimes",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas", "{{cinemaId}}", "showtimes"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas",
+								"{{cinemaId}}",
+								"showtimes"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Cinema (Admin)",
@@ -441,10 +603,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/cinemas",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Cinema (Admin)",
@@ -466,10 +633,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas", "{{cinemaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas",
+								"{{cinemaId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Cinema (Admin)",
@@ -483,10 +656,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/cinemas/{{cinemaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["cinemas", "{{cinemaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cinemas",
+								"{{cinemaId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -500,10 +679,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/halls/{{hallId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls", "{{hallId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls",
+								"{{hallId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Hall Seats",
@@ -512,10 +697,17 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/halls/{{hallId}}/seats",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls", "{{hallId}}", "seats"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls",
+								"{{hallId}}",
+								"seats"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Hall (Admin)",
@@ -537,10 +729,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/halls",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Hall (Admin)",
@@ -562,10 +759,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/halls/{{hallId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls", "{{hallId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls",
+								"{{hallId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Hall (Admin)",
@@ -579,10 +782,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/halls/{{hallId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls", "{{hallId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls",
+								"{{hallId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Generate Seats (Admin)",
@@ -604,10 +813,17 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/halls/{{hallId}}/seats",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls", "{{hallId}}", "seats"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls",
+								"{{hallId}}",
+								"seats"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete All Seats (Admin)",
@@ -621,10 +837,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/halls/{{hallId}}/seats",
-							"host": ["{{baseUrl}}"],
-							"path": ["halls", "{{hallId}}", "seats"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"halls",
+								"{{hallId}}",
+								"seats"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -638,17 +861,40 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/showtimes?page=1&limit=20",
-							"host": ["{{baseUrl}}"],
-							"path": ["showtimes"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"showtimes"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "20"},
-								{"key": "movieId", "value": "", "disabled": true},
-								{"key": "cinemaId", "value": "", "disabled": true},
-								{"key": "date", "value": "", "disabled": true}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "movieId",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "cinemaId",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "date",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Showtime By ID",
@@ -657,10 +903,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["showtimes", "{{showtimeId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"showtimes",
+								"{{showtimeId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Showtime Seats",
@@ -669,10 +921,17 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}/seats",
-							"host": ["{{baseUrl}}"],
-							"path": ["showtimes", "{{showtimeId}}", "seats"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"showtimes",
+								"{{showtimeId}}",
+								"seats"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Showtime (Admin)",
@@ -694,10 +953,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/showtimes",
-							"host": ["{{baseUrl}}"],
-							"path": ["showtimes"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"showtimes"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Showtime (Admin)",
@@ -719,10 +983,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["showtimes", "{{showtimeId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"showtimes",
+								"{{showtimeId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Showtime (Admin)",
@@ -736,10 +1006,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/showtimes/{{showtimeId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["showtimes", "{{showtimeId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"showtimes",
+								"{{showtimeId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -762,14 +1038,20 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seatIds\": []\n}"
+							"raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seatIds\": [\"c1566616-d40a-40ec-8dd0-06659ad675eb\"]\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/bookings/lock",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "lock"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"lock"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Unlock Seats",
@@ -791,10 +1073,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/bookings/unlock",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "unlock"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"unlock"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get My Seat Locks",
@@ -808,10 +1096,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/locks/my",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "locks", "my"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"locks",
+								"my"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Booking",
@@ -826,7 +1121,8 @@
 									"        pm.environment.set('bookingId', response.data.id);",
 									"    }",
 									"}"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -848,10 +1144,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/bookings",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Payment",
@@ -873,10 +1174,17 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/bookings/{{bookingId}}/payment",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "{{bookingId}}", "payment"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"{{bookingId}}",
+								"payment"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get My Bookings",
@@ -890,14 +1198,26 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/my?page=1&limit=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "my"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"my"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "10"}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Booking By ID",
@@ -911,10 +1231,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/{{bookingId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "{{bookingId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"{{bookingId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Booking By Code",
@@ -928,10 +1254,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/code/{{bookingCode}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "code", "{{bookingCode}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"code",
+								"{{bookingCode}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Cancel Booking",
@@ -945,10 +1278,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/{{bookingId}}/cancel",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "{{bookingId}}", "cancel"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"{{bookingId}}",
+								"cancel"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Bookings (Admin)",
@@ -962,14 +1302,27 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/admin/all?page=1&limit=20",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "admin", "all"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"admin",
+								"all"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "20"}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Showtime Bookings (Admin)",
@@ -983,10 +1336,18 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/admin/showtime/{{showtimeId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "admin", "showtime", "{{showtimeId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"admin",
+								"showtime",
+								"{{showtimeId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Expire Pending Bookings (Admin)",
@@ -1000,10 +1361,132 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/bookings/admin/expire",
-							"host": ["{{baseUrl}}"],
-							"path": ["bookings", "admin", "expire"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bookings",
+								"admin",
+								"expire"
+							]
 						}
-					}
+					},
+					"response": [
+						{
+							"name": "Expire Pending Bookings (Admin)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/bookings/admin/expire",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"bookings",
+										"admin",
+										"expire"
+									]
+								}
+							},
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=30000000&vnp_Command=pay&vnp_CreateDate=20251109014444&vnp_CurrCode=VND&vnp_ExpireDate=20251109015944&vnp_IpAddr=%3A%3Affff%3A172.66.156.100&vnp_Locale=vn&vnp_OrderInfo=Thanh+toan+cho+ma+GD%3A7fa60204-7176-4f45-9686-e0eaa0ac28e6&vnp_OrderType=other&vnp_ReturnUrl=http%3A%2F%2Flocalhost%3A3004%2Fapi%2Fbookings%2Fvnpay_return&vnp_TmnCode=0GEGLRAD&vnp_TxnRef=7fa60204-7176-4f45-9686-e0eaa0ac28e6&vnp_Version=2.1.0&vnp_SecureHash=b77269cac888ce13a99e9839e3e803d20af0a527cdb97e7d69c20aa2c5cd3843590aad9eea695a6170013e3ea51fa96f0b5b3c82d9d41433b53a98f2bb6ff787",
+							"protocol": "https",
+							"host": [
+								"sandbox",
+								"vnpayment",
+								"vn"
+							],
+							"path": [
+								"paymentv2",
+								"vpcpay.html"
+							],
+							"query": [
+								{
+									"key": "vnp_Amount",
+									"value": "30000000"
+								},
+								{
+									"key": "vnp_Command",
+									"value": "pay"
+								},
+								{
+									"key": "vnp_CreateDate",
+									"value": "20251109014444"
+								},
+								{
+									"key": "vnp_CurrCode",
+									"value": "VND"
+								},
+								{
+									"key": "vnp_ExpireDate",
+									"value": "20251109015944"
+								},
+								{
+									"key": "vnp_IpAddr",
+									"value": "%3A%3Affff%3A172.66.156.100"
+								},
+								{
+									"key": "vnp_Locale",
+									"value": "vn"
+								},
+								{
+									"key": "vnp_OrderInfo",
+									"value": "Thanh+toan+cho+ma+GD%3A7fa60204-7176-4f45-9686-e0eaa0ac28e6"
+								},
+								{
+									"key": "vnp_OrderType",
+									"value": "other"
+								},
+								{
+									"key": "vnp_ReturnUrl",
+									"value": "http%3A%2F%2Flocalhost%3A3004%2Fapi%2Fbookings%2Fvnpay_return"
+								},
+								{
+									"key": "vnp_TmnCode",
+									"value": "0GEGLRAD"
+								},
+								{
+									"key": "vnp_TxnRef",
+									"value": "7fa60204-7176-4f45-9686-e0eaa0ac28e6"
+								},
+								{
+									"key": "vnp_Version",
+									"value": "2.1.0"
+								},
+								{
+									"key": "vnp_SecureHash",
+									"value": "b77269cac888ce13a99e9839e3e803d20af0a527cdb97e7d69c20aa2c5cd3843590aad9eea695a6170013e3ea51fa96f0b5b3c82d9d41433b53a98f2bb6ff787"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			]
 		},
@@ -1022,10 +1505,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/tickets/{{ticketId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", "{{ticketId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								"{{ticketId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Tickets By Booking",
@@ -1039,10 +1528,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/tickets/booking/{{bookingId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", "booking", "{{bookingId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								"booking",
+								"{{bookingId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Tickets By Showtime (Staff)",
@@ -1056,10 +1552,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/tickets/showtime/{{showtimeId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", "showtime", "{{showtimeId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								"showtime",
+								"{{showtimeId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Scan Ticket (Staff)",
@@ -1081,10 +1584,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/tickets/scan",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", "scan"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								"scan"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1097,14 +1606,23 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/concessions?cinemaId={{cinemaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["concessions"],
+							"raw": "{{baseUrl}}/concessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"concessions"
+							],
 							"query": [
-								{"key": "cinemaId", "value": "{{cinemaId}}", "disabled": true}
+								{
+									"key": "cinemaId",
+									"value": "{{cinemaId}}",
+									"disabled": true
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Concession By ID",
@@ -1113,10 +1631,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/concessions/{{concessionId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["concessions", "{{concessionId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"concessions",
+								"{{concessionId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Concession (Admin)",
@@ -1138,10 +1662,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/concessions",
-							"host": ["{{baseUrl}}"],
-							"path": ["concessions"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"concessions"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Concession (Admin)",
@@ -1163,10 +1692,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/concessions/{{concessionId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["concessions", "{{concessionId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"concessions",
+								"{{concessionId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Concession (Admin)",
@@ -1180,10 +1715,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/concessions/{{concessionId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["concessions", "{{concessionId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"concessions",
+								"{{concessionId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1197,14 +1738,25 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/reviews?page=1&limit=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "10"}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cinema Reviews",
@@ -1213,10 +1765,17 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/reviews/cinema/{{cinemaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews", "cinema", "{{cinemaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"cinema",
+								"{{cinemaId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cinema Review Stats",
@@ -1225,10 +1784,18 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/reviews/cinema/{{cinemaId}}/stats",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews", "cinema", "{{cinemaId}}", "stats"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"cinema",
+								"{{cinemaId}}",
+								"stats"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get My Reviews",
@@ -1242,10 +1809,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/reviews/my",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews", "my"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"my"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Create Review",
@@ -1267,10 +1840,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/reviews",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Review",
@@ -1292,10 +1870,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews", "{{reviewId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Review",
@@ -1309,10 +1893,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["reviews", "{{reviewId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1331,15 +1921,30 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/users?page=1&limit=20",
-							"host": ["{{baseUrl}}"],
-							"path": ["users"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							],
 							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "20"},
-								{"key": "role", "value": "", "disabled": true}
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "role",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Current User Profile",
@@ -1353,10 +1958,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/users/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "me"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Current User Profile",
@@ -1378,10 +1989,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/users/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "me"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get User By ID (Admin)",
@@ -1395,10 +2012,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "{{userId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update User Role (Admin)",
@@ -1420,10 +2043,17 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}/role",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "{{userId}}", "role"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"role"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete User (Admin)",
@@ -1437,10 +2067,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "{{userId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Cinema Employees (Manager)",
@@ -1454,10 +2090,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/users/cinema/{{cinemaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "cinema", "{{cinemaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"cinema",
+								"{{cinemaId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1471,10 +2114,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/seats/{{seatId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["seats", "{{seatId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"seats",
+								"{{seatId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Seat (Admin)",
@@ -1496,10 +2145,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/seats/{{seatId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["seats", "{{seatId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"seats",
+								"{{seatId}}"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1513,10 +2168,15 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/health",
-							"host": ["{{baseUrl}}"],
-							"path": ["health"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		}

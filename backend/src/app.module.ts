@@ -18,6 +18,7 @@ import { TicketsModule } from './modules/tickets/tickets.module';
 import { ConcessionsModule } from './modules/concessions/concessions.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { HealthModule } from './health/health.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { HealthModule } from './health/health.module';
     ConcessionsModule,
     ReviewsModule,
     HealthModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

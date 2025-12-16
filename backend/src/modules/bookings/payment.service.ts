@@ -255,6 +255,58 @@ export class PaymentService {
     verifyResult: VNPayVerifyResult,
   ): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
+      // Get booking with seat locks
+      const booking = await tx.booking.findUnique({
+        where: { id: bookingId },
+        include: {
+          tickets: true,
+        },
+      });
+
+      if (!booking) {
+        throw new NotFoundException('Booking not found');
+      }
+
+      // Get seat locks for this booking to create tickets
+      const seatLocks = await tx.seatLock.findMany({
+        where: {
+          showtimeId: booking.showtimeId,
+          userId: booking.userId,
+        },
+        include: {
+          seat: true,
+        },
+      });
+
+      if (seatLocks.length === 0) {
+        throw new BadRequestException('No seat locks found for this booking');
+      }
+
+      // Get pricing for the showtime
+      const showtime = await tx.showtime.findUnique({
+        where: { id: booking.showtimeId },
+        include: { pricing: true },
+      });
+
+      if (!showtime) {
+        throw new NotFoundException('Showtime not found');
+      }
+
+      // Create price map
+      const priceMap = new Map(
+        showtime.pricing.map((p) => [p.seatType, Number(p.price)]),
+      );
+
+      // Create tickets from seat locks
+      await tx.ticket.createMany({
+        data: seatLocks.map((lock) => ({
+          bookingId: booking.id,
+          seatId: lock.seatId,
+          showtimeId: booking.showtimeId,
+          price: priceMap.get(lock.seat.type) || 0,
+        })),
+      });
+
       // Update payment record
       await tx.payment.update({
         where: { bookingId },
@@ -275,21 +327,13 @@ export class PaymentService {
         data: { status: 'CONFIRMED' },
       });
 
-      // Remove seat locks
-      const booking = await tx.booking.findUnique({
-        where: { id: bookingId },
-        include: { tickets: true },
+      // Remove seat locks after tickets are created
+      await tx.seatLock.deleteMany({
+        where: {
+          showtimeId: booking.showtimeId,
+          seatId: { in: seatLocks.map((lock) => lock.seatId) },
+        },
       });
-
-      if (booking) {
-        const seatIds = booking.tickets.map((t) => t.seatId);
-        await tx.seatLock.deleteMany({
-          where: {
-            showtimeId: booking.showtimeId,
-            seatId: { in: seatIds },
-          },
-        });
-      }
     });
   }
 

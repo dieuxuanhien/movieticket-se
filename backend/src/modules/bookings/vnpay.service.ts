@@ -83,6 +83,27 @@ export class VnpayService {
   }
 
   /**
+   * Normalize IP address to IPv4 format
+   * Handles IPv6-mapped IPv4 addresses like ::ffff:192.168.1.1
+   * @param ipAddr Raw IP address
+   * @returns Normalized IPv4 address
+   */
+  private normalizeIpAddress(ipAddr: string): string {
+    // Handle IPv6-mapped IPv4 addresses (::ffff:x.x.x.x)
+    if (ipAddr.startsWith('::ffff:')) {
+      return ipAddr.substring(7); // Remove ::ffff: prefix
+    }
+
+    // Handle other IPv6 addresses - return localhost for IPv6
+    if (ipAddr.includes(':')) {
+      return '127.0.0.1';
+    }
+
+    // Return as-is for IPv4 addresses
+    return ipAddr;
+  }
+
+  /**
    * Build VNPAY payment URL
    * @param params Payment parameters
    * @returns Payment URL string
@@ -91,6 +112,8 @@ export class VnpayService {
     this.logger.log('Building VNPAY payment URL', {
       txnRef: params.txnRef,
       amount: params.amount,
+      originalIpAddr: params.ipAddr,
+      normalizedIpAddr: this.normalizeIpAddress(params.ipAddr),
     });
 
     const date = new Date();
@@ -111,7 +134,7 @@ export class VnpayService {
       vnp_OrderType: this.orderType,
       vnp_Amount: params.amount * 100, // VNPAY expects amount in smallest currency unit
       vnp_ReturnUrl: params.returnUrl || this.returnUrl,
-      vnp_IpAddr: params.ipAddr,
+      vnp_IpAddr: this.normalizeIpAddress(params.ipAddr),
       vnp_CreateDate: createDate,
       vnp_ExpireDate: expireDateStr,
     };
@@ -124,8 +147,8 @@ export class VnpayService {
     // Sort parameters alphabetically
     const sortedParams = this.sortObject(vnpParams);
 
-    // Create the query string (without encoding)
-    const signData = this.buildQueryString(sortedParams);
+    // Create the query string for signing (WITH URL encoding as per VNPay docs)
+    const signData = this.buildSignatureData(sortedParams);
 
     // Create the secure hash
     const hmac = crypto.createHmac('sha512', this.secureSecret);
@@ -134,8 +157,8 @@ export class VnpayService {
     // Add secure hash to params
     sortedParams.vnp_SecureHash = signed;
 
-    // Build final URL
-    const paymentUrl = `${this.vnpayHost}/paymentv2/vpcpay.html?${this.buildQueryString(
+    // Build final URL (also needs URL encoding)
+    const paymentUrl = `${this.vnpayHost}?${this.buildQueryStringEncoded(
       sortedParams,
     )}`;
 
@@ -166,7 +189,7 @@ export class VnpayService {
 
     // Sort and create sign data
     const sortedParams = this.sortObject(verifyParams);
-    const signData = this.buildQueryString(sortedParams);
+    const signData = this.buildSignatureData(sortedParams);
 
     // Calculate hash
     const hmac = crypto.createHmac('sha512', this.secureSecret);
@@ -227,23 +250,46 @@ export class VnpayService {
   }
 
   /**
-   * Sort object keys alphabetically
+   * Sort object keys alphabetically and encode VALUES only (not keys)
+   * This matches VNPay's expected signature format
    */
-  private sortObject(obj: Record<string, any>): Record<string, any> {
-    const sorted: Record<string, any> = {};
-    const keys = Object.keys(obj).sort();
+  private sortObject(obj: Record<string, any>): Record<string, string> {
+    const sorted: Record<string, string> = {};
+    const keys: string[] = [];
 
+    // Get all keys (DO NOT encode keys)
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        keys.push(key);
+      }
+    }
+
+    // Sort keys alphabetically
+    keys.sort();
+
+    // Build sorted object with original keys and encoded values
     for (const key of keys) {
-      sorted[key] = obj[key];
+      // Encode VALUES only, replace %20 with '+'
+      sorted[key] = encodeURIComponent(String(obj[key])).replace(/%20/g, '+');
     }
 
     return sorted;
   }
 
   /**
-   * Build query string without URL encoding (VNPAY requirement)
+   * Build signature data string from already-encoded values
+   * Keys are NOT encoded, values are already encoded in sortObject
    */
-  private buildQueryString(obj: Record<string, any>): string {
+  private buildSignatureData(obj: Record<string, string>): string {
+    return Object.keys(obj)
+      .map((key) => `${key}=${obj[key]}`)
+      .join('&');
+  }
+
+  /**
+   * Build query string for final payment URL (same as signature data)
+   */
+  private buildQueryStringEncoded(obj: Record<string, string>): string {
     return Object.keys(obj)
       .map((key) => `${key}=${obj[key]}`)
       .join('&');
