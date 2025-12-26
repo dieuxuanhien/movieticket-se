@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { HallsService } from './halls.service';
 import { CreateHallDto, UpdateHallDto, CreateSeatsDto } from './dto/hall.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { CinemaAccessGuard } from '../../common/guards/cinema-access.guard';
 import { UserRole } from '../../common/constants/app.constants';
@@ -34,7 +34,7 @@ export class HallsController {
   }
 
   @Post()
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new hall (Admin/Manager)' })
@@ -44,7 +44,7 @@ export class HallsController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a hall (Admin/Manager)' })
@@ -54,7 +54,7 @@ export class HallsController {
   }
 
   @Delete(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a hall (Admin only)' })
@@ -71,7 +71,7 @@ export class HallsController {
   }
 
   @Post(':id/seats')
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create seats for a hall (Admin/Manager)' })
@@ -84,7 +84,7 @@ export class HallsController {
   }
 
   @Delete(':id/seats')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete all seats in a hall (Admin only)' })

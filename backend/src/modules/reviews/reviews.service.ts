@@ -5,6 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { ClerkService } from '../../infrastructure/clerk/clerk.service';
 import { PaginationService } from '../../common/services/pagination.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
 
@@ -12,6 +13,7 @@ import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
 export class ReviewsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly clerkService: ClerkService,
     private readonly paginationService: PaginationService,
   ) {}
 
@@ -31,9 +33,6 @@ export class ReviewsService {
         skip,
         take: perPage,
         include: {
-          user: {
-            select: { id: true, fullName: true },
-          },
           cinema: {
             select: { id: true, name: true },
           },
@@ -43,8 +42,17 @@ export class ReviewsService {
       this.prisma.cinemaReview.count({ where }),
     ]);
 
+    // Enrich with user info from Clerk (batch)
+    const userIds = [...new Set(reviews.map((r) => r.userId))];
+    const userMap = await this.clerkService.getBatchUserInfo(userIds);
+
+    const enrichedReviews = reviews.map((review) => ({
+      ...review,
+      user: userMap.get(review.userId) || null,
+    }));
+
     return {
-      data: reviews,
+      data: enrichedReviews,
       pagination: {
         total,
         page,
@@ -63,15 +71,19 @@ export class ReviewsService {
       throw new NotFoundException('Cinema not found');
     }
 
-    return this.prisma.cinemaReview.findMany({
+    const reviews = await this.prisma.cinemaReview.findMany({
       where: { cinemaId },
-      include: {
-        user: {
-          select: { id: true, fullName: true },
-        },
-      },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Enrich with user info from Clerk (batch)
+    const userIds = [...new Set(reviews.map((r) => r.userId))];
+    const userMap = await this.clerkService.getBatchUserInfo(userIds);
+
+    return reviews.map((review) => ({
+      ...review,
+      user: userMap.get(review.userId) || null,
+    }));
   }
 
   async getCinemaStats(cinemaId: string) {
@@ -112,7 +124,7 @@ export class ReviewsService {
   }
 
   async getUserReviews(userId: string) {
-    return this.prisma.cinemaReview.findMany({
+    const reviews = await this.prisma.cinemaReview.findMany({
       where: { userId },
       include: {
         cinema: {
@@ -121,6 +133,14 @@ export class ReviewsService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Enrich with user info from Clerk
+    const userInfo = await this.clerkService.getUserInfo(userId);
+
+    return reviews.map((review) => ({
+      ...review,
+      user: userInfo,
+    }));
   }
 
   async create(userId: string, createReviewDto: CreateReviewDto) {
@@ -147,20 +167,25 @@ export class ReviewsService {
       throw new ConflictException('You have already reviewed this cinema');
     }
 
-    return this.prisma.cinemaReview.create({
+    const review = await this.prisma.cinemaReview.create({
       data: {
         ...createReviewDto,
         userId,
       },
       include: {
-        user: {
-          select: { id: true, fullName: true },
-        },
         cinema: {
           select: { id: true, name: true },
         },
       },
     });
+
+    // Enrich with user info from Clerk
+    const userInfo = await this.clerkService.getUserInfo(userId);
+
+    return {
+      ...review,
+      user: userInfo,
+    };
   }
 
   async update(id: string, userId: string, updateReviewDto: UpdateReviewDto) {
@@ -176,18 +201,23 @@ export class ReviewsService {
       throw new ForbiddenException('You can only update your own reviews');
     }
 
-    return this.prisma.cinemaReview.update({
+    const updatedReview = await this.prisma.cinemaReview.update({
       where: { id },
       data: updateReviewDto,
       include: {
-        user: {
-          select: { id: true, fullName: true },
-        },
         cinema: {
           select: { id: true, name: true },
         },
       },
     });
+
+    // Enrich with user info from Clerk
+    const userInfo = await this.clerkService.getUserInfo(userId);
+
+    return {
+      ...updatedReview,
+      user: userInfo,
+    };
   }
 
   async delete(id: string, userId: string) {

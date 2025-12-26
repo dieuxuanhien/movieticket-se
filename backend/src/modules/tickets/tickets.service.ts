@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { ClerkService } from '../../infrastructure/clerk/clerk.service';
 import { CustomLoggerService } from '../../common/services/logger.service';
 import { ScanTicketDto } from './dto/ticket.dto';
 
@@ -12,6 +13,7 @@ import { ScanTicketDto } from './dto/ticket.dto';
 export class TicketsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly clerkService: ClerkService,
     private readonly logger: CustomLoggerService,
   ) {
     this.logger = new CustomLoggerService(TicketsService.name);
@@ -21,13 +23,7 @@ export class TicketsService {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id },
       include: {
-        booking: {
-          include: {
-            user: {
-              select: { id: true, fullName: true, email: true },
-            },
-          },
-        },
+        booking: true,
         seat: true,
         showtime: {
           include: {
@@ -43,7 +39,16 @@ export class TicketsService {
       throw new NotFoundException('Ticket not found');
     }
 
-    return ticket;
+    // Enrich with user info from booking's userId
+    const userInfo = await this.clerkService.getUserInfo(ticket.booking.userId);
+
+    return {
+      ...ticket,
+      booking: {
+        ...ticket.booking,
+        user: userInfo,
+      },
+    };
   }
 
   /**
@@ -208,16 +213,10 @@ export class TicketsService {
   }
 
   async getTicketsByShowtime(showtimeId: string) {
-    return this.prisma.ticket.findMany({
+    const tickets = await this.prisma.ticket.findMany({
       where: { showtimeId },
       include: {
-        booking: {
-          include: {
-            user: {
-              select: { id: true, fullName: true, email: true },
-            },
-          },
-        },
+        booking: true,
         seat: true,
       },
       orderBy: [
@@ -225,5 +224,17 @@ export class TicketsService {
         { seat: { seatNumber: 'asc' } },
       ],
     });
+
+    // Enrich with user info from Clerk (batch)
+    const userIds = [...new Set(tickets.map((t) => t.booking.userId))];
+    const userMap = await this.clerkService.getBatchUserInfo(userIds);
+
+    return tickets.map((ticket) => ({
+      ...ticket,
+      booking: {
+        ...ticket.booking,
+        user: userMap.get(ticket.booking.userId) || null,
+      },
+    }));
   }
 }

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, UseGuards, Body } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { ScanTicketDto } from './dto/ticket.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { CinemaAccessGuard } from '../../common/guards/cinema-access.guard';
 import { CurrentUserCinemaId } from '../../common/decorators/current-user.decorator';
@@ -19,7 +19,7 @@ export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
   @Get(':id')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get ticket by ID' })
   @ApiResponse({ status: 200, description: 'Ticket details' })
@@ -28,7 +28,7 @@ export class TicketsController {
   }
 
   @Post('scan')
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.STAFF, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Scan ticket at entry (Staff/Manager)' })
@@ -44,7 +44,7 @@ export class TicketsController {
   }
 
   @Get('booking/:bookingId')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get tickets for a booking' })
   @ApiResponse({ status: 200, description: 'List of tickets' })
@@ -53,7 +53,7 @@ export class TicketsController {
   }
 
   @Get('showtime/:showtimeId')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ShowtimesService } from './showtimes.service';
 import { CreateShowtimeDto, UpdateShowtimeDto } from './dto/showtime.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { CinemaAccessGuard } from '../../common/guards/cinema-access.guard';
 import { UserRole } from '../../common/constants/app.constants';
@@ -61,7 +61,7 @@ export class ShowtimesController {
   }
 
   @Post()
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new showtime (Admin/Manager)' })
@@ -71,7 +71,7 @@ export class ShowtimesController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a showtime (Admin/Manager)' })
@@ -84,7 +84,7 @@ export class ShowtimesController {
   }
 
   @Delete(':id')
-  @UseGuards(SupabaseGuard, RoleGuard, CinemaAccessGuard)
+  @UseGuards(ClerkGuard, RoleGuard, CinemaAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a showtime (Admin/Manager)' })

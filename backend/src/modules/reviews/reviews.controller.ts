@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { CurrentUserId } from '../../common/decorators/current-user.decorator';
 import {
   ApiTags,
@@ -55,7 +55,7 @@ export class ReviewsController {
   }
 
   @Get('my')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get my reviews' })
   @ApiResponse({ status: 200, description: 'List of user reviews' })
@@ -64,7 +64,7 @@ export class ReviewsController {
   }
 
   @Post()
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a review' })
   @ApiResponse({ status: 201, description: 'Review created' })
@@ -76,7 +76,7 @@ export class ReviewsController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a review' })
   @ApiResponse({ status: 200, description: 'Review updated' })
@@ -89,7 +89,7 @@ export class ReviewsController {
   }
 
   @Delete(':id')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a review' })
   @ApiResponse({ status: 200, description: 'Review deleted' })

@@ -1,7 +1,7 @@
 import { Controller, Get, Put, Param, Body, UseGuards } from '@nestjs/common';
 import { SeatsService } from './seats.service';
 import { UpdateSeatDto } from './dto/seat.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { UserRole } from '../../common/constants/app.constants';
 import {
@@ -24,7 +24,7 @@ export class SeatsController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a seat (Admin/Manager)' })

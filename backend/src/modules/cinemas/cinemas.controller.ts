@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CinemasService } from './cinemas.service';
 import { CreateCinemaDto, UpdateCinemaDto } from './dto/cinema.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { UserRole } from '../../common/constants/app.constants';
 import {
@@ -54,7 +54,7 @@ export class CinemasController {
   }
 
   @Post()
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new cinema (Admin only)' })
@@ -64,7 +64,7 @@ export class CinemasController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a cinema (Admin only)' })
@@ -77,7 +77,7 @@ export class CinemasController {
   }
 
   @Delete(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a cinema (Admin only)' })

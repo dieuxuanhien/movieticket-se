@@ -1,18 +1,24 @@
 import { PrismaClient } from '@prisma/client';
-import config from '../src/config/configuration';
+import { createClerkClient } from '@clerk/backend';
 import { genres } from './seed-data/genres';
-import { users } from './seed-data/users';
 import { cinemas } from './seed-data/cinemas';
 import { halls } from './seed-data/halls';
 import { movies } from './seed-data/movies';
 import { concessions } from './seed-data/concessions';
+import { users } from './seed-data/users';
 
 const prisma = new PrismaClient();
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY!,
+});
 
 // Notes:
-// - Supabase manages auth users. This seeder REQUIRES SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
-//   to be set. It will create auth users in Supabase for each seeded user and use their IDs
-//   for the Prisma User records. Seeding will fail if Supabase auth creation fails.
+// - Users are managed fully in Clerk with publicMetadata
+// - This unified script handles both database seeding AND Clerk user creation
+// - Database: cinemas, movies, halls, seats, showtimes, pricing, concessions
+// - Clerk: users with roles (ADMIN, MANAGER, STAFF, USER) and cinema assignments
+
+const DEFAULT_PASSWORD = 'Password123!';
 
 // Seed Genres
 async function seedGenres() {
@@ -39,79 +45,6 @@ async function seedCinemas() {
     console.log(`✓ Created cinema: ${result.name} in ${result.city}`);
   }
   return createdCinemas;
-}
-
-// Seed Users
-async function seedUsers(createdCinemas: any[]) {
-  console.log('👥 Seeding users...');
-  
-  // Check for required Supabase environment variables
-  const { supabase } = config();
-  const SUPABASE_URL = supabase.url;
-  const SUPABASE_SERVICE_KEY = supabase.serviceRoleKey;
-  
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-    throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set to seed users with Supabase auth.');
-  }
-  
-  // Assign cinema IDs to managers and staff
-  const updatedUsers = users.map((user, index) => {
-    if (user.role === 'MANAGER' && index === 1) {
-      return { ...user, cinemaId: createdCinemas[0]?.id }; // First manager -> First cinema
-    } else if (user.role === 'MANAGER' && index === 2) {
-      return { ...user, cinemaId: createdCinemas[2]?.id }; // Second manager -> Third cinema
-    } else if (user.role === 'STAFF' && index === 3) {
-      return { ...user, cinemaId: createdCinemas[0]?.id }; // First staff -> First cinema
-    } else if (user.role === 'STAFF' && index === 4) {
-      return { ...user, cinemaId: createdCinemas[2]?.id }; // Second staff -> Third cinema
-    }
-    return user;
-  });
-
-  async function createAuthUser(email: string, metadata = {}) {
-    const password = "Password123!"; // Default password for seeded users
-
-    const resp = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
-        apikey: SUPABASE_SERVICE_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: metadata,
-      }),
-    });
-
-    if (!resp.ok) {
-      const body = await resp.text();
-      throw new Error(`Failed to create Supabase auth user for ${email}: ${resp.status} ${body}`);
-    }
-
-    const data = await resp.json();
-    if (!data?.id) {
-      throw new Error(`Supabase did not return an ID for user ${email}`);
-    }
-    return data.id;
-  }
-
-  for (const user of updatedUsers) {
-    const { email, fullName, phone, role, cinemaId } = user as any;
-
-    console.log(`Creating Supabase auth user for ${email}...`);
-    const authId = await createAuthUser(email, { name: fullName, phone });
-    console.log(`✓ Created auth user ${email} -> id ${authId}`);
-
-    const result = await prisma.user.upsert({
-      where: { email },
-      update: { id: authId, fullName, phone, role, cinemaId },
-      create: { id: authId, email, fullName, phone, role, cinemaId },
-    });
-    console.log(`✓ Created/updated Prisma user: ${result.email} (${result.role})`);
-  }
 }
 
 // Seed Halls and Seats
@@ -312,55 +245,92 @@ async function seedConcessions(createdCinemas: any[]) {
   }
 }
 
-// Seed Sample Reviews
-async function seedReviews(createdCinemas: any[]) {
-  console.log('⭐ Seeding sample reviews...');
+// Seed Clerk Users
+async function seedClerkUsers(createdCinemas: any[]) {
+  console.log('👥 Seeding users in Clerk...');
   
-  const sampleReviews = [
-    {
-      cinemaId: createdCinemas[0]?.id,
-      userEmail: 'user1@example.com',
-      rating: 5,
-      comment: 'Great cinema! Clean and comfortable seats.',
-    },
-    {
-      cinemaId: createdCinemas[0]?.id,
-      userEmail: 'user2@example.com',
-      rating: 4,
-      comment: 'Good sound system, but parking is limited.',
-    },
-    {
-      cinemaId: createdCinemas[2]?.id,
-      userEmail: 'user1@example.com',
-      rating: 5,
-      comment: 'Amazing IMAX experience! Will come back.',
-    },
-  ];
-  
-  for (const review of sampleReviews) {
-    if (!review.cinemaId) continue;
+  if (!process.env.CLERK_SECRET_KEY) {
+    console.warn('⚠️  CLERK_SECRET_KEY not set. Skipping Clerk user creation.');
+    console.warn('   Add CLERK_SECRET_KEY to your .env file to enable user seeding.\n');
+    return;
+  }
 
-    const user = await prisma.user.findUnique({ where: { email: (review as any).userEmail } });
-    if (!user) {
-      console.warn(`Skipping review: user ${(review as any).userEmail} not found`);
-      continue;
+  // Parse full name and assign cinemas
+  const usersToCreate = users.map((user, index) => {
+    const nameParts = user.fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Assign cinemas to managers and staff
+    let cinemaId = user.cinemaId;
+    if (user.role === 'MANAGER' || user.role === 'STAFF') {
+      if (index === 1) {
+        // First manager -> First cinema
+        cinemaId = createdCinemas[0]?.id || null;
+      } else if (index === 2) {
+        // Second manager -> Third cinema
+        cinemaId = createdCinemas[2]?.id || null;
+      } else if (index === 3) {
+        // First staff -> First cinema
+        cinemaId = createdCinemas[0]?.id || null;
+      } else if (index === 4) {
+        // Second staff -> Third cinema
+        cinemaId = createdCinemas[2]?.id || null;
+      }
     }
 
-    await prisma.cinemaReview.create({
-      data: {
-        cinemaId: review.cinemaId,
-        userId: user.id,
-        rating: review.rating,
-        comment: review.comment,
-      },
-    });
-    console.log(`✓ Created review for cinema ${review.cinemaId} by ${user.email}`);
+    return {
+      email: user.email,
+      firstName,
+      lastName,
+      phone: user.phone,
+      role: user.role,
+      cinemaId,
+      fullName: user.fullName,
+    };
+  });
+
+  let successCount = 0;
+  let skipCount = 0;
+
+  for (const userData of usersToCreate) {
+    try {
+      const user = await clerkClient.users.createUser({
+        emailAddress: [userData.email],
+        password: DEFAULT_PASSWORD,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phoneNumber: userData.phone ? [userData.phone] : undefined,
+        publicMetadata: {
+          role: userData.role,
+          cinemaId: userData.cinemaId,
+          phone: userData.phone,
+          fullName: userData.fullName,
+        },
+        skipPasswordChecks: true,
+        skipPasswordRequirement: false,
+      });
+
+      console.log(`✓ Created Clerk user: ${userData.email} (${userData.role})`);
+      successCount++;
+    } catch (error: any) {
+      if (error.errors?.[0]?.code === 'form_identifier_exists') {
+        console.warn(`⚠️  User ${userData.email} already exists in Clerk, skipping...`);
+        skipCount++;
+      } else {
+        console.error(`❌ Failed to create user ${userData.email}:`, error.errors || error);
+      }
+    }
   }
+
+  console.log(
+    `\n  Created: ${successCount} users | Skipped: ${skipCount} users (already exist)\n`,
+  );
 }
 
 // Main seeding function
 async function main() {
-  console.log('🌱 Starting database seeding...\n');
+  console.log('🌱 Starting unified database and Clerk seeding...\n');
 
   try {
     // Clear existing data (optional - be careful in production!)
@@ -376,20 +346,16 @@ async function main() {
     await prisma.concession.deleteMany({});
     await prisma.seat.deleteMany({});
     await prisma.hall.deleteMany({});
-    await prisma.user.deleteMany({});
     await prisma.cinema.deleteMany({});
     await prisma.movie.deleteMany({});
     await prisma.genre.deleteMany({});
     console.log('✓ Cleanup complete\n');
 
-    // Seed in order
+    // Seed database first
     await seedGenres();
     console.log();
     
     const createdCinemas = await seedCinemas();
-    console.log();
-    
-    await seedUsers(createdCinemas);
     console.log();
     
     const createdHalls = await seedHalls(createdCinemas);
@@ -403,20 +369,23 @@ async function main() {
     
     await seedConcessions(createdCinemas);
     console.log();
-    
-    await seedReviews(createdCinemas);
+
+    // Seed users in Clerk
+    await seedClerkUsers(createdCinemas);
     console.log();
 
-    console.log('✅ Database seeding completed successfully! 🎉');
-    console.log('\n📊 Summary:');
+    console.log('✅ Unified seeding completed successfully! 🎉');
+    console.log('\n📊 Database Summary:');
     console.log(`   - ${genres.length} genres`);
     console.log(`   - ${createdCinemas.length} cinemas`);
     console.log(`   - ${createdHalls.length} halls`);
     console.log(`   - ${createdMovies.length} movies`);
-    console.log(`   - ${users.length} users`);
     console.log(`   - ${concessions.length} concessions`);
     console.log(`   - Multiple showtimes with dynamic pricing`);
-    console.log(`   - Sample reviews`);
+    console.log(`\n� Clerk Summary:`);
+    console.log(`   - ${users.length} users created with roles and cinema assignments`);
+    console.log(`\n💡 Default password for all users: ${DEFAULT_PASSWORD}`);
+    console.log('   Change passwords in Clerk Dashboard if needed\n');
   } catch (error) {
     console.error('❌ Error during seeding:', error);
     throw error;

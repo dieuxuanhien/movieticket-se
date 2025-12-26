@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignInDto, SignUpDto } from './dto/auth.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { SignUpDto } from './dto/auth.dto';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import {
   ApiTags,
@@ -15,8 +15,16 @@ import {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Note: With Clerk, most authentication is handled on the frontend
+   * Sign in/Sign up use Clerk's components: <SignIn />, <SignUp />
+   * This endpoint is for API-based signup if needed
+   */
   @Post('signup')
-  @ApiOperation({ summary: 'Register a new user' })
+  @ApiOperation({
+    summary: 'Register a new user (API-based)',
+    description: 'For most cases, use Clerk frontend components for signup',
+  })
   @ApiResponse({
     status: 201,
     description: 'User successfully registered',
@@ -29,38 +37,12 @@ export class AuthController {
     return this.authService.signUp(signUpDto);
   }
 
-  @Post('signin')
-  @ApiOperation({ summary: 'Login user' })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully logged in',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - invalid credentials',
-  })
-  async signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto.email, signInDto.password);
-  }
-
-  @Post('signout')
-  @UseGuards(SupabaseGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Logout user' })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully logged out',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  async signOut(@CurrentUser('token') token: string) {
-    return this.authService.signOut(token);
-  }
-
+  /**
+   * Get current user profile
+   * User is authenticated by ClerkGuard
+   */
   @Get('me')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
@@ -73,15 +55,5 @@ export class AuthController {
   })
   async getProfile(@CurrentUser() user: any) {
     return this.authService.getProfile(user);
-  }
-
-  @Post('refresh')
-  @ApiOperation({ summary: 'Refresh access token' })
-  @ApiResponse({
-    status: 200,
-    description: 'Token refreshed successfully',
-  })
-  async refreshToken(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshToken(refreshToken);
   }
 }

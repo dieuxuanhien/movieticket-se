@@ -15,13 +15,14 @@ import {
 } from './dto/booking.dto';
 import { nanoid } from 'nanoid';
 import { PaymentStatus } from '../../common/constants/app.constants';
-
+import { ClerkService } from 'src/infrastructure/clerk/clerk.service';
 @Injectable()
 export class BookingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly logger: CustomLoggerService,
     private readonly configService: ConfigService,
+    private readonly clerkService: ClerkService,
   ) {
     this.logger = new CustomLoggerService(BookingsService.name);
   }
@@ -235,9 +236,6 @@ export class BookingsService {
     const booking = await this.prisma.booking.findUnique({
       where: { id },
       include: {
-        user: {
-          select: { id: true, fullName: true, email: true, phone: true },
-        },
         showtime: {
           include: { movie: true, cinema: true, hall: true, pricing: true },
         },
@@ -278,16 +276,19 @@ export class BookingsService {
       })) as any;
     }
 
-    return booking;
+    // Enrich with user info from Clerk
+    const userInfo = await this.clerkService.getUserInfo(booking.userId);
+
+    return {
+      ...booking,
+      user: userInfo,
+    };
   }
 
   async getBookingByCode(bookingCode: string, userId?: string): Promise<any> {
     const booking = await this.prisma.booking.findUnique({
       where: { bookingCode },
       include: {
-        user: {
-          select: { id: true, fullName: true, email: true, phone: true },
-        },
         showtime: {
           include: { movie: true, cinema: true, hall: true, pricing: true },
         },
@@ -328,7 +329,13 @@ export class BookingsService {
       })) as any;
     }
 
-    return booking;
+    // Enrich with user info from Clerk
+    const userInfo = await this.clerkService.getUserInfo(booking.userId);
+
+    return {
+      ...booking,
+      user: userInfo,
+    };
   }
 
   async getUserBookings(userId: string, status?: string): Promise<any[]> {
@@ -498,32 +505,46 @@ export class BookingsService {
       where.createdAt = { gte: startOfDay, lte: endOfDay };
     }
 
-    return this.prisma.booking.findMany({
+    const bookings = await this.prisma.booking.findMany({
       where,
       include: {
-        user: { select: { id: true, fullName: true, email: true } },
         showtime: { include: { movie: true, cinema: true, hall: true } },
         tickets: true,
         payment: true,
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Enrich with user info from Clerk (batch)
+    const userIds = [...new Set(bookings.map((b) => b.userId))];
+    const userMap = await this.clerkService.getBatchUserInfo(userIds);
+
+    return bookings.map((booking) => ({
+      ...booking,
+      user: userMap.get(booking.userId) || null,
+    }));
   }
 
   async getBookingsByShowtime(showtimeId: string): Promise<any[]> {
-    return this.prisma.booking.findMany({
+    const bookings = await this.prisma.booking.findMany({
       where: {
         showtimeId,
         status: { in: ['CONFIRMED', 'PENDING'] },
       },
       include: {
-        user: {
-          select: { id: true, fullName: true, email: true, phone: true },
-        },
         tickets: { include: { seat: true } },
         payment: true,
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Enrich with user info from Clerk (batch)
+    const userIds = [...new Set(bookings.map((b) => b.userId))];
+    const userMap = await this.clerkService.getBatchUserInfo(userIds);
+
+    return bookings.map((booking) => ({
+      ...booking,
+      user: userMap.get(booking.userId) || null,
+    }));
   }
 }

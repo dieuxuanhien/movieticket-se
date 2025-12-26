@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ConcessionsService } from './concessions.service';
 import { CreateConcessionDto, UpdateConcessionDto } from './dto/concession.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { UserRole } from '../../common/constants/app.constants';
 import {
@@ -43,7 +43,7 @@ export class ConcessionsController {
   }
 
   @Post()
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new concession item (Admin/Manager)' })
@@ -53,7 +53,7 @@ export class ConcessionsController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a concession item (Admin/Manager)' })
@@ -66,7 +66,7 @@ export class ConcessionsController {
   }
 
   @Delete(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a concession item (Admin only)' })

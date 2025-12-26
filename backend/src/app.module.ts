@@ -4,9 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { CommonModule } from './common/common.module';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
-import { SupabaseModule } from './infrastructure/supabase/supabase.module';
+import { ClerkModule } from './infrastructure/clerk/clerk.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
 import { MoviesModule } from './modules/movies/movies.module';
 import { GenresModule } from './modules/genres/genres.module';
 import { CinemasModule } from './modules/cinemas/cinemas.module';
@@ -17,6 +16,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { ConcessionsModule } from './modules/concessions/concessions.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { HealthModule } from './health/health.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
@@ -25,9 +25,8 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
     ConfigModule,
     CommonModule,
     PrismaModule,
-    SupabaseModule,
+    ClerkModule,
     AuthModule,
-    UsersModule,
     MoviesModule,
     GenresModule,
     CinemasModule,
@@ -38,6 +37,7 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
     TicketsModule,
     ConcessionsModule,
     ReviewsModule,
+    WebhooksModule,
     HealthModule,
     SchedulerModule,
   ],

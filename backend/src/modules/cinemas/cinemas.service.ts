@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { ClerkService } from '../../infrastructure/clerk/clerk.service';
 import { CreateCinemaDto, UpdateCinemaDto } from './dto/cinema.dto';
 
 @Injectable()
 export class CinemasService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly clerkService: ClerkService,
+  ) {}
 
   async findAll(city?: string, status?: string) {
     const where: any = {};
@@ -52,11 +56,6 @@ export class CinemasService {
         reviews: {
           take: 10,
           orderBy: { createdAt: 'desc' },
-          include: {
-            user: {
-              select: { id: true, fullName: true },
-            },
-          },
         },
         concessions: true,
       },
@@ -64,6 +63,17 @@ export class CinemasService {
 
     if (!cinema) {
       throw new NotFoundException('Cinema not found');
+    }
+
+    // Enrich reviews with user info from Clerk (batch)
+    if (cinema.reviews.length > 0) {
+      const userIds = [...new Set(cinema.reviews.map((r) => r.userId))];
+      const userMap = await this.clerkService.getBatchUserInfo(userIds);
+
+      cinema.reviews = cinema.reviews.map((review) => ({
+        ...review,
+        user: userMap.get(review.userId) || null,
+      })) as any;
     }
 
     return cinema;

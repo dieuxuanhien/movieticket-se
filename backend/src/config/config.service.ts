@@ -25,6 +25,23 @@ export class ConfigService {
     return process.env.SUPABASE_JWT_SECRET;
   }
 
+  // Clerk Configuration
+  get clerkPublishableKey(): string {
+    return this.configService.get<string>('clerk.publishableKey');
+  }
+
+  get clerkSecretKey(): string {
+    return this.configService.get<string>('clerk.secretKey');
+  }
+
+  get clerkWebhookSecret(): string {
+    return this.configService.get<string>('clerk.webhookSecret');
+  }
+
+  get clerkFrontendUrl(): string {
+    return this.configService.get<string>('clerk.frontendUrl');
+  }
+
   get databaseUrl(): string {
     return this.configService.get<string>('database.url');
   }

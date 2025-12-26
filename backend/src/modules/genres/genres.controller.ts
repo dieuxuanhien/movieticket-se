@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { GenresService } from './genres.service';
 import { CreateGenreDto, UpdateGenreDto } from './dto/genre.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { UserRole } from '../../common/constants/app.constants';
 import {
@@ -40,7 +40,7 @@ export class GenresController {
   }
 
   @Post()
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new genre (Admin only)' })
@@ -50,7 +50,7 @@ export class GenresController {
   }
 
   @Put(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a genre (Admin only)' })
@@ -63,7 +63,7 @@ export class GenresController {
   }
 
   @Delete(':id')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a genre (Admin only)' })

@@ -19,7 +19,7 @@ import {
   CreateBookingDto,
   CreatePaymentDto,
 } from './dto/booking.dto';
-import { SupabaseGuard } from '../../common/guards/supabase.guard';
+import { ClerkGuard } from '../../common/guards/clerk.guard';
 import { RoleGuard, Roles } from '../../common/guards/role.guard';
 import { CurrentUserId } from '../../common/decorators/current-user.decorator';
 import { UserRole, BookingStatus } from '../../common/constants/app.constants';
@@ -43,7 +43,7 @@ export class BookingsController {
   // ==================== SEAT LOCKING ====================
 
   @Post('lock')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Lock seats for booking',
@@ -59,7 +59,7 @@ export class BookingsController {
   }
 
   @Post('unlock')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Release locked seats' })
   @ApiResponse({ status: 200, description: 'Seats unlocked successfully' })
@@ -71,7 +71,7 @@ export class BookingsController {
   }
 
   @Get('locks/my')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get my locked seats' })
   @ApiResponse({ status: 200, description: 'List of locked seats' })
@@ -82,7 +82,7 @@ export class BookingsController {
   // ==================== BOOKING CREATION ====================
 
   @Post()
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Create booking',
@@ -103,7 +103,7 @@ export class BookingsController {
   // ==================== PAYMENT ====================
 
   @Post(':id/payment')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Create payment URL',
@@ -157,7 +157,7 @@ export class BookingsController {
   // ==================== USER BOOKINGS ====================
 
   @Get('my')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get my bookings' })
   @ApiQuery({ name: 'status', required: false, enum: BookingStatus })
@@ -170,7 +170,7 @@ export class BookingsController {
   }
 
   @Get(':id')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get booking details' })
   @ApiResponse({ status: 200, description: 'Booking details' })
@@ -179,7 +179,7 @@ export class BookingsController {
   }
 
   @Get('code/:bookingCode')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get booking by code' })
   @ApiResponse({ status: 200, description: 'Booking details' })
@@ -191,7 +191,7 @@ export class BookingsController {
   }
 
   @Post(':id/cancel')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(ClerkGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Cancel a booking' })
   @ApiResponse({ status: 200, description: 'Booking cancelled' })
@@ -205,7 +205,7 @@ export class BookingsController {
   // ==================== ADMIN ENDPOINTS ====================
 
   @Get('admin/all')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get all bookings (Admin/Manager)' })
@@ -222,7 +222,7 @@ export class BookingsController {
   }
 
   @Get('admin/showtime/:showtimeId')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get bookings for a showtime' })
@@ -232,7 +232,7 @@ export class BookingsController {
   }
 
   @Post('admin/expire')
-  @UseGuards(SupabaseGuard, RoleGuard)
+  @UseGuards(ClerkGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Expire pending bookings (cron job trigger)' })
